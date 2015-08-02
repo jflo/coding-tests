@@ -5,19 +5,30 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
+
 import java.util.stream.Stream;
 
 public class ArtistPairings {
 	
 	public static void main(String[] args) {
+		Set<String> popular = refinePopular();
+		
 		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath()).parallel()) {
 			//Set<UnorderedPair<String,String>> uniquePairs = new HashSet<UnorderedPair<String,String>>();
 			List<UnorderedPair<String, String>> answers = stream
 				 .map(s -> Arrays.asList(s.split(",")))
 				 .flatMap(l -> allPairs(l).parallelStream())
 				 .distinct()
+				 .filter(p -> popular.contains(p.getLeft()) && popular.contains(p.getRight()))
 				 .filter(p->occurrsTimes(p,50))
 				 .collect(Collectors.toList());
 				 
@@ -30,6 +41,24 @@ public class ArtistPairings {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private static Set<String> refinePopular() {
+		Set<String> popular = new HashSet<String>();
+		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath()).parallel()) {
+			final Map<String, Long> bandFreq = stream
+					.map(s -> Arrays.asList(s.split(",")))
+					.flatMap(l -> l.parallelStream())
+					.collect(groupingBy(Function.identity(), counting()));
+		
+			bandFreq.keySet().stream()
+					 .filter(k -> bandFreq.get(k) >= 50)
+					 .forEach(n -> popular.add(n));
+			
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return popular;
 	}
 	
 	private static boolean occurrsTimes(UnorderedPair<String, String> p, int threshold) {
