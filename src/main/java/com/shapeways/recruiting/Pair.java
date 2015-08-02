@@ -1,11 +1,19 @@
 package com.shapeways.recruiting;
 
-public class UnorderedPair<L,R> {
+/**
+ * Specifically, this is an unordered pair. The hashcode and equals methods have been implemented to disregard ordering.
+ * foo,bar == bar,foo
+ * @author florentj
+ *
+ * @param <L>
+ * @param <R>
+ */
+public class Pair<L,R> {
 
 		private final L left;
 		private final R right;
 		
-		public UnorderedPair(L left, R right) {
+		public Pair(L left, R right) {
 			this.left = left;
 			this.right = right;
 		}
@@ -23,7 +31,7 @@ public class UnorderedPair<L,R> {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			UnorderedPair other = (UnorderedPair) obj;
+			Pair other = (Pair) obj;
 			if(this.left.equals(other.left) && this.right.equals(other.right)) {
 				return true;
 			} else if(this.left.equals(other.right) && this.right.equals(other.left)){
@@ -35,7 +43,7 @@ public class UnorderedPair<L,R> {
 
 		@Override
 		public String toString() {
-			return "UnorderedPair [left=" + left + ", right=" + right + "]";
+			return left + "," + right;
 		}
 
 		public L getLeft() {
