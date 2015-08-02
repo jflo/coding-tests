@@ -19,7 +19,7 @@ public class ArtistPairings {
 				 .map(s -> Arrays.asList(s.split(",")))
 				 .flatMap(l -> allPairs(l).stream())
 				 .distinct()
-				 .filter(p->countInFile(p) >= 50)
+				 .filter(p->occurrsTimes(p,50))
 				 .collect(Collectors.toList());
 				 
 				 
@@ -31,6 +31,27 @@ public class ArtistPairings {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private static boolean occurrsTimes(UnorderedPair<String, String> p, int threshold) {
+		boolean retval = false;
+		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath())) {
+			//File content = new File();
+			
+			long count = stream
+				 .map(s -> Arrays.asList(s.split(",")))
+				 .filter(l -> l.contains(p.getLeft()) && l.contains(p.getRight()))
+				 .limit(threshold)
+				 .count();
+			if(count>=threshold) {
+				System.out.println(p + "should make the list");
+				return true;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retval;
 	}
 
 	private static long countInFile(UnorderedPair<String, String> p)  {
