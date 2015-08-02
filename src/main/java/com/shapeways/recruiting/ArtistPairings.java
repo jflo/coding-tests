@@ -12,12 +12,11 @@ import java.util.stream.Stream;
 public class ArtistPairings {
 	
 	public static void main(String[] args) {
-		try {
+		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath()).parallel()) {
 			//Set<UnorderedPair<String,String>> uniquePairs = new HashSet<UnorderedPair<String,String>>();
-			List<UnorderedPair<String, String>> answers =
-			Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath())
+			List<UnorderedPair<String, String>> answers = stream
 				 .map(s -> Arrays.asList(s.split(",")))
-				 .flatMap(l -> allPairs(l).stream())
+				 .flatMap(l -> allPairs(l).parallelStream())
 				 .distinct()
 				 .filter(p->occurrsTimes(p,50))
 				 .collect(Collectors.toList());
@@ -56,7 +55,7 @@ public class ArtistPairings {
 
 	private static long countInFile(UnorderedPair<String, String> p)  {
 		long retval = 0;
-		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath())) {
+		try(Stream<String> stream = Files.lines(new File("src/main/resources/Artist_lists_small.txt").toPath()).parallel()) {
 			//File content = new File();
 			
 			retval = stream
